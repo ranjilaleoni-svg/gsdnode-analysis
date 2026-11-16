@@ -2,6 +2,10 @@
 
 Independent analysis of a root-privileged remote-control / residential-proxy agent (`gsdnode_android`) found pre-installed in the factory firmware of a cheap Rockchip RK3528-based Android TV box sold under the `HS86UI` / `hugsun x88pro` branding.
 
+## How this started
+
+I'd heard that cheap Chinese Android TV boxes are notorious for shipping with malware or botnet code, so when I got one, I suspected it probably had something hidden in it too. I didn't want to dig through firmware internals by hand, so I used an AI assistant (Claude, via wireless ADB access to the box) to help investigate: pull a full hardware report, test playback, then actively scan for anything suspicious. That scan turned up a root-privileged process (`gsdnode_android`) that didn't belong in a normal media player. From there, the AI and I went deeper — static analysis of the binary, correlating it with a public repository that had analyzed byte-identical files from a different rebranded box, capturing live network traffic to confirm the command-and-control server was actually active, and finally writing all of it up here, plus a script to neutralize the agent on the device itself. The suspicion going in was right; this repo is what came out of actually checking.
+
 - 🇬🇧 Full report: [REPORT_EN.md](REPORT_EN.md)
 - 🇷🇴 Raport complet (română): [RAPORT_RO.md](RAPORT_RO.md)
 - Indicators of Compromise: [IOCs.md](IOCs.md)

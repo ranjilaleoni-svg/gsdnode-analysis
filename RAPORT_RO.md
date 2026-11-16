@@ -4,6 +4,10 @@
 **Data:** 2026-11-16
 **Device:** Box Android TV, etichetat `HS86UI`, placă `rockchip,rk3518-hugsun-x88pro-ddr4-v10` (chip-ul e de fapt RK3528A; „RK3518" pare o eticheta greșită folosită de acest vendor), Android 14, fingerprint de build `HS86UI.E160320.667.FE`, 1GB RAM, ~8GB eMMC, build userdebug, SELinux **Permissive**, bootloader deblocat, proprietăți de device/model Google falsificate ca Pixel 5 ("redfin").
 
+## Cum a început
+
+Auzisem că boxurile chinezești ieftine sunt renumite pentru malware sau cod de botnet ascuns în ele, așa că atunci când am luat unul, am bănuit că probabil are și al meu ceva ascuns. N-am vrut să scormonesc manual prin firmware, așa că am folosit un asistent AI (Claude, prin acces ADB wireless la box) ca să investighez: am scos un raport complet de hardware, am testat redarea, apoi am cerut un scan activ pentru orice e suspect. Scanarea a scos la iveală un proces cu privilegii root (`gsdnode_android`) care n-avea ce căuta într-un simplu media player. De acolo, am mers mai adânc — analiză statică a binarului, corelare cu un repository public care analizase fișiere identice byte-cu-byte de pe un alt box rebranduit, captură de trafic live ca să confirm că serverul de comandă-control chiar e activ, și în final, tot ce vezi aici, plus un script care neutralizează agentul direct pe device. Bănuiala inițială s-a confirmat; acest raport e rezultatul verificării efective.
+
 ## Informații despre achiziție
 
 Exact acest device (fingerprint de build `HS86UI.E160320.667.FE`) a fost cumpărat din România prin **eMag Marketplace**, listat sub numele „Player Media 8K HDR" (TV Box Android, HS86UI Pro X88), vândut și livrat de comerciantul de pe marketplace **UWOT GERMANY GMBH**, cu 233,17 Lei, în noiembrie 2026.
