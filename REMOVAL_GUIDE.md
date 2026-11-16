@@ -95,6 +95,10 @@ The malicious agent lives inside the device's **system firmware image**, not jus
 - **If the box installs an OTA/firmware update** (if you haven't disabled that — which this script also does, for the vendor's own update apps, but a full OTA system update could still overwrite everything), the same thing can happen.
 - We also strongly recommend blocking the malicious domains at your router level (see [blocklist.txt](blocklist.txt)) as a second layer of defense that survives resets.
 
+### 🔒 Want a fix that survives a factory reset?
+
+This guide's fix lives in `/data` only, so a factory reset undoes it. For a permanent, firmware-level removal (deletes the malicious files from `/system` itself, plus bloatware cleanup and performance tweaks) — **advanced, carries real brick risk, read the warnings first** — see [OPTIMIZATION_GUIDE.md](OPTIMIZATION_GUIDE.md).
+
 ### 💡 Future idea
 
 A simple phone/desktop app that automates all of the above (pair, connect, root, push script, verify, remind you to redo it after a reset) would make this accessible to non-technical users. Not built yet — this is a possible follow-up project. If you want to help build it, open an issue or a PR.
@@ -190,6 +194,10 @@ Agentul malițios trăiește în **imaginea de firmware de sistem** a device-ulu
 - **Dacă faci factory reset la box**, `/data` se șterge, iar scriptul watchdog (încă prezent în `/system`) va recopia binarul original malițios din `/system/bin/gsdnode_android` înapoi în `/data/gsdnode/`, anulând fix-ul. **Va trebui să refaci Pașii 3-6 după orice factory reset.**
 - **Dacă boxul instalează un update OTA/firmware** (dacă n-ai dezactivat asta — ceea ce face și scriptul ăsta, pentru aplicațiile de update ale vendor-ului, dar un update complet de sistem OTA tot ar putea suprascrie totul), se poate întâmpla la fel.
 - Recomandăm cu tărie și blocarea domeniilor malițioase la nivel de router (vezi [blocklist.txt](blocklist.txt)), ca al doilea strat de apărare care supraviețuiește resetărilor.
+
+### 🔒 Vrei un fix care supraviețuiește unui factory reset?
+
+Fix-ul din acest ghid trăiește doar în `/data`, deci un factory reset îl anulează. Pentru o eliminare permanentă, la nivel de firmware (șterge fișierele malițioase chiar din `/system`, plus curățare bloatware și optimizări de performanță) — **avansat, risc real de brick, citește avertismentele întâi** — vezi [OPTIMIZATION_GUIDE.md](OPTIMIZATION_GUIDE.md).
 
 ### 💡 Idee pentru viitor
 
