@@ -20,3 +20,15 @@
 | Package names | `com.amediatech.update`, `com.chihi.fota`, `android.rockchip.update.service` | pre-installed, persistent, same signature |
 | Native binary path | `/system/bin/gsdnode_android`, `/data/gsdnode/gsdnode_android` | |
 | Hidden payload path (referenced, not present at analysis time) | `/data/blueberry/blueberry.sh` | loaded via RKUpdateService.apk |
+
+## Sample files
+
+Raw samples (`gsdnode_android` binary, `init.sh`, and the three FOTA/update APKs — `Abupdate_new.apk`, `FotaUpdate.apk`, `RKUpdateService.apk`) are provided in [`samples.zip`](samples.zip) as an **AES-256 encrypted, password-protected** archive — standard malware-research convention, to avoid accidental execution and automated scanning/takedown of the raw files.
+
+- Archive: `samples.zip`
+- Password: `infected`
+- SHA256 of the archive: `b95073c050dc4377934f9558cfe4a2dffc450a013eeeff0511c10746c0555dc6`
+
+Individual file hashes are listed in the table above and should match after extraction.
+
+**⚠️ WARNING / DISCLAIMER:** These files are provided strictly for security research, static analysis, and verification of the hashes above. They are **not** intended to be installed or executed on any device. The authors/publishers of this repository take **no responsibility** for any damage, data loss, security compromise, legal issue, or other consequence resulting from extracting, installing, running, or otherwise using these files. If you choose to install or run any file from `samples.zip`, you do so **entirely at your own risk** and on your own authority — ideally only inside an isolated, disposable analysis environment (e.g. a sandboxed VM or emulator with no network access), never on a personal or production device.

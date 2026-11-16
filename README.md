@@ -15,3 +15,5 @@ A $20-30 Android TV box ships with a root-privileged agent that phones home to a
 ## Disclaimer
 
 This is independent, best-effort research by a device owner, not a professional security audit. No vendor was contacted prior to publication (see the report for why). Use the removal script at your own risk — it was tested on one device only. This repository does not encourage or provide instructions for attacking the C2 infrastructure described; it documents it for defensive/informational purposes only.
+
+**Sample files (`samples.zip`) are for research/verification only.** They are password-protected precisely so they are not run by accident. The authors/publishers of this repository accept **no responsibility whatsoever** for any damage, compromise, data loss, or legal consequence arising from extracting, installing, or executing any file from that archive, or from running `neutralize_gsdnode.sh`. Everything in this repository is provided "as is", without warranty of any kind (see [LICENSE](LICENSE)). You are solely responsible for what you choose to run on your own hardware.
