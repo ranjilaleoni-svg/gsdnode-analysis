@@ -106,6 +106,83 @@ We attempted to turn the box into a lightweight home-automation hub (Node-RED, t
 
 We also decided against running Home Assistant Core or any hub software *on this box* at all — 1GB of RAM is genuinely too little for it to run reliably, even before hitting the `apt` issue.
 
+### Part 7 — Replacing the factory launcher
+
+The stock launcher (`com.android.box.tvlauncher`) is closed-source; don't try to decompile/patch it. Install an open-source alternative instead and switch to it cleanly:
+
+```
+adb install <launcher.apk>
+adb shell "cmd package set-home-activity <package>/<LauncherActivityClass>"
+adb shell "pm disable-user --user 0 com.android.box.tvlauncher"
+```
+
+We settled on [ChillHub](https://github.com/AppleChillVibez/ChillHub) (`app.lumoslabs.chillhub`, also on Google Play) after trying and rejecting [Projectivy Launcher](https://github.com/spocky/miproja1). Find the exact launcher activity name first with:
+
+```
+adb shell "pm dump <package> | grep -A3 'android.intent.category.HOME'"
+```
+
+### Part 8 — Fixing fabricated hardware properties (display, storage, RAM)
+
+This device's factory firmware reports fake specs in the Settings UI itself — not just in hidden `getprop` values, but in what **Settings → Storage** actually displays to the user:
+
+```
+adb shell "getprop | grep -iE 'storage.total|storage.size|mem.size'"
+# persist.skytest.storage.total: 256GB (real eMMC: ~8GB)
+# persist.storage.size: 256 GB
+# persist.mem.size: 16 GB (real RAM: ~1GB)
+
+adb shell "setprop persist.skytest.storage.total '8GB'"
+adb shell "setprop persist.storage.size '8 GB'"
+adb shell "setprop persist.mem.size '1 GB'"
+adb shell "am force-stop com.android.tv.settings"
+```
+
+These are `persist.*` properties, so they survive reboot. Verify in **Settings → Device Preferences → Storage**.
+
+Separately, we found a **display resolution override** forcing apps to render at 3840×2160 while the real panel is 1280×720 (density override 640 vs. real 213) — this causes visibly wrong UI scaling in some apps:
+
+```
+adb shell "wm size"       # shows "Override size: 3840x2160" if affected
+adb shell "wm size reset"
+adb shell "wm density reset"
+```
+
+### Part 9 — Streaming app buffering: a real hardware limit, not a bug
+
+If a torrent-based streaming app (e.g. Stremio) buffers badly even on a decent connection, check memory pressure first:
+
+```
+adb shell "cat /proc/meminfo | head -3"
+adb shell "top -b -n 1 | head -15"    # look for high %CPU on [kswapd0] and the app's own server process
+```
+
+On this 1GB RAM device, we measured 95%+ RAM used and `kswapd0` (kernel memory reclaim) at 40% CPU **even at idle**, and during active torrent playback the app's embedded streaming-server process plus its main process together used roughly half the entire CPU. This is a genuine hardware ceiling, not something a setting fixes:
+
+- Prefer addons/sources that give **direct HTTP links** (including debrid services) over torrent-based ones — this moves all the heavy piece-management work off the device entirely.
+- `am force-stop <package>` between viewing sessions for a clean restart.
+- **Caution**: we triggered a full system hang (unresponsive to ADB, had to power-cycle) by restarting a torrent-streaming app while RAM was already critically low. No data was lost (it only affects running apps, not the firmware changes from Part 1), but don't be surprised if it happens to you too under the same conditions.
+
+### Part 10 — Round two: more factory/tracking services safe to disable
+
+Beyond Part 2's list, these are safe to `pm disable-user --user 0` on a personal device (not an enterprise-managed one):
+
+```
+com.android.adservices.api  com.android.ext.adservices.api  com.android.sdksandbox
+com.android.federatedcompute.services  com.android.ondevicepersonalization.services
+com.android.healthconnect.controller  com.android.health.connect.backuprestore
+com.android.virtualmachine.res  com.android.uwb.resources  com.android.dynsystem
+com.android.nearby.halfsheet  com.google.android.feedback
+com.google.android.marvin.talkback      # TalkBack screen reader — skip if you need accessibility
+com.android.music  com.android.calculator2
+com.google.android.apps.mediashell      # Chromecast built-in — skip if you want casting to work
+com.google.android.tvrecommendations  com.google.android.katniss   # voice search/assistant
+```
+
+Two things to watch for:
+- `com.android.devicelockcontroller` is a **protected package** — `pm disable-user` throws `SecurityException: Cannot disable a protected package`. It's harmless and inactive anyway; not worth removing it at the firmware level just for this.
+- **Double-check `com.google.android.gms` (Google Play Services) stays enabled** after a batch-disable loop. We found it unexpectedly disabled once during this process (cause unconfirmed — possibly a pre-existing state, not necessarily caused by the batch itself) and had to re-enable it with `pm enable --user 0 com.google.android.gms`. Disabling it breaks Play Store, sign-in, and push notifications for most apps.
+
 ---
 
 ## 🇷🇴 Română
@@ -207,3 +284,80 @@ Am încercat să transformăm boxul într-un hub ușor de automatizări casnice 
 **Dacă vrei control simplu on/off pentru prize smart Wi-Fi de pe telefon, sari peste Termux complet**: instalează [HTTP Shortcuts](https://github.com/Waboodoo/HTTP-Shortcuts) (open source) pe **telefon**, și creează câte un buton pentru fiecare dispozitiv, care apelează direct API-ul lui HTTP local (ex: `http://<ip-priza>/cm?cmnd=Power%20Toggle` pentru Tasmota, `http://<ip-priza>/relay/0?turn=toggle` pentru Shelly). Fără hub, fără server, fără bug de `apt` de luptat.
 
 Am decis și să renunțăm complet la ideea de a rula Home Assistant Core sau orice software de hub *pe acest box* — 1GB de RAM e cu adevărat prea puțin ca să ruleze fiabil, chiar înainte să dăm de problema cu `apt`.
+
+### Partea 7 — Înlocuirea launcher-ului din fabrică
+
+Launcher-ul stock (`com.android.box.tvlauncher`) e closed-source; nu încerca să-l decompilezi/patch-uiești. În schimb, instalează o alternativă open-source și comută curat pe ea:
+
+```
+adb install <launcher.apk>
+adb shell "cmd package set-home-activity <pachet>/<NumeClasaLauncherActivity>"
+adb shell "pm disable-user --user 0 com.android.box.tvlauncher"
+```
+
+Am ales [ChillHub](https://github.com/AppleChillVibez/ChillHub) (`app.lumoslabs.chillhub`, și pe Google Play) după ce am testat și respins [Projectivy Launcher](https://github.com/spocky/miproja1). Găsește numele exact al activității de launcher întâi cu:
+
+```
+adb shell "pm dump <pachet> | grep -A3 'android.intent.category.HOME'"
+```
+
+### Partea 8 — Corectarea proprietăților de hardware fabricate (display, stocare, RAM)
+
+Firmware-ul de fabrică al acestui device raportează specificații false chiar în interfața Settings — nu doar în valori ascunse `getprop`, ci în ce afișează efectiv **Settings → Storage** utilizatorului:
+
+```
+adb shell "getprop | grep -iE 'storage.total|storage.size|mem.size'"
+# persist.skytest.storage.total: 256GB (eMMC real: ~8GB)
+# persist.storage.size: 256 GB
+# persist.mem.size: 16 GB (RAM real: ~1GB)
+
+adb shell "setprop persist.skytest.storage.total '8GB'"
+adb shell "setprop persist.storage.size '8 GB'"
+adb shell "setprop persist.mem.size '1 GB'"
+adb shell "am force-stop com.android.tv.settings"
+```
+
+Astea sunt proprietăți `persist.*`, deci supraviețuiesc unui reboot. Verifică în **Settings → Device Preferences → Storage**.
+
+Separat, am găsit un **override de rezoluție de display** care forța aplicațiile să randeze la 3840×2160 deși panelul real e 1280×720 (densitate override 640 vs. reală 213) — asta cauzează scalare vizibil greșită a UI-ului în unele aplicații:
+
+```
+adb shell "wm size"       # arata "Override size: 3840x2160" daca e afectat
+adb shell "wm size reset"
+adb shell "wm density reset"
+```
+
+### Partea 9 — Buffering la aplicații de streaming: o limitare reală de hardware, nu un bug
+
+Dacă o aplicație de streaming bazată pe torrent (ex: Stremio) face buffer prost chiar și pe o conexiune decentă, verifică întâi presiunea de memorie:
+
+```
+adb shell "cat /proc/meminfo | head -3"
+adb shell "top -b -n 1 | head -15"    # cauta %CPU mare la [kswapd0] si la procesul propriu de server al aplicatiei
+```
+
+Pe acest device cu 1GB RAM, am măsurat 95%+ RAM folosit și `kswapd0` (recuperare memorie din kernel) la 40% CPU **chiar la idle**, iar în timpul redării active prin torrent, procesul serverului intern de streaming al aplicației plus procesul principal foloseau împreună aproximativ jumătate din tot CPU-ul. E un plafon real de hardware, nu ceva ce o setare rezolvă:
+
+- Preferă addon-uri/surse cu **linkuri HTTP directe** (inclusiv servicii debrid) în loc de cele bazate pe torrent — asta mută toată munca grea de gestionare a pieselor în afara device-ului complet.
+- `am force-stop <pachet>` între sesiunile de vizionare, pentru o pornire curată.
+- **Atenție**: am declanșat un blocaj complet de sistem (nerăspunzător la ADB, a trebuit power-cycle fizic) repornind o aplicație de streaming torrent cât timp RAM-ul era deja critic de puțin. Nicio dată n-a fost pierdută (afectează doar aplicațiile care rulau, nu modificările de firmware din Partea 1), dar nu te surprinde dacă ți se întâmplă și ție în condiții similare.
+
+### Partea 10 — Runda a doua: mai multe servicii factory/tracking sigure de dezactivat
+
+Dincolo de lista din Partea 2, astea sunt sigure de dezactivat cu `pm disable-user --user 0` pe un device personal (nu unul administrat enterprise):
+
+```
+com.android.adservices.api  com.android.ext.adservices.api  com.android.sdksandbox
+com.android.federatedcompute.services  com.android.ondevicepersonalization.services
+com.android.healthconnect.controller  com.android.health.connect.backuprestore
+com.android.virtualmachine.res  com.android.uwb.resources  com.android.dynsystem
+com.android.nearby.halfsheet  com.google.android.feedback
+com.google.android.marvin.talkback      # cititorul de ecran TalkBack — sari peste daca ai nevoie de accesibilitate
+com.android.music  com.android.calculator2
+com.google.android.apps.mediashell      # Chromecast built-in — sari peste daca vrei sa mearga casting-ul
+com.google.android.tvrecommendations  com.google.android.katniss   # cautare vocala/asistent
+```
+
+Două lucruri de urmărit:
+- `com.android.devicelockcontroller` e un **pachet protejat** — `pm disable-user` aruncă `SecurityException: Cannot disable a protected package`. E inofensiv și oricum inactiv; nu merită eliminat la nivel de firmware doar pentru atât.
+- **Verifică de două ori că `com.google.android.gms` (Google Play Services) rămâne activat** după o buclă de dezactivări în masă. Noi l-am găsit dezactivat pe neașteptate o dată în timpul acestui proces (cauza neconfirmată — posibil o stare preexistentă, nu neapărat cauzată de buclă în sine) și a trebuit să-l reactivăm cu `pm enable --user 0 com.google.android.gms`. Dezactivarea lui strică Play Store, autentificarea și notificările push pentru majoritatea aplicațiilor.
