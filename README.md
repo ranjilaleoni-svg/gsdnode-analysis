@@ -19,6 +19,7 @@ Auzisem că boxurile chinezești ieftine sunt renumite pentru malware sau cod de
 - **🛠️ Step-by-step removal guide / Ghid pas cu pas de eliminare: [REMOVAL_GUIDE.md](REMOVAL_GUIDE.md)**
 - **📺 Advertised specs vs. actual hardware + playback tests / Specificații publicitate vs. hardware real + teste de redare: [PLAYBACK_TESTS.md](PLAYBACK_TESTS.md)**
 - **⚙️ Full optimization & permanent removal guide / Ghid complet de optimizare și eliminare permanentă: [OPTIMIZATION_GUIDE.md](OPTIMIZATION_GUIDE.md)**
+- **🚨 Incident report: a boot hang, a real factory reset, and recovery without reflashing / Raport incident: blocaj de boot, factory reset real, și recuperare fără reflash: [INCIDENT_boot_hang.md](INCIDENT_boot_hang.md)**
 - Indicators of Compromise: [IOCs.md](IOCs.md)
 - Removal script (tested, non-destructive — stubs the agent, does not touch `/system`): [neutralize_gsdnode.sh](neutralize_gsdnode.sh)
 - Router-level domain blocklist: [blocklist.txt](blocklist.txt)
