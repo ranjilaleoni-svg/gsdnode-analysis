@@ -1,0 +1,8 @@
+0.0.0.0 tws.gsda.com.cn
+0.0.0.0 gsda.com.cn
+0.0.0.0 api.fota.rupa.tv
+0.0.0.0 fota.rupa.tv
+0.0.0.0 ota.rupa.tv
+0.0.0.0 api.hugsun.com.cn
+0.0.0.0 fota.hugsun.com.cn
+0.0.0.0 erp.hugsun.com.cn
