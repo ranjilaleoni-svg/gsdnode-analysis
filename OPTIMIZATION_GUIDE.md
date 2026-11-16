@@ -361,3 +361,50 @@ com.google.android.tvrecommendations  com.google.android.katniss   # cautare voc
 Două lucruri de urmărit:
 - `com.android.devicelockcontroller` e un **pachet protejat** — `pm disable-user` aruncă `SecurityException: Cannot disable a protected package`. E inofensiv și oricum inactiv; nu merită eliminat la nivel de firmware doar pentru atât.
 - **Verifică de două ori că `com.google.android.gms` (Google Play Services) rămâne activat** după o buclă de dezactivări în masă. Noi l-am găsit dezactivat pe neașteptate o dată în timpul acestui proces (cauza neconfirmată — posibil o stare preexistentă, nu neapărat cauzată de buclă în sine) și a trebuit să-l reactivăm cu `pm enable --user 0 com.google.android.gms`. Dezactivarea lui strică Play Store, autentificarea și notificările push pentru majoritatea aplicațiilor.
+
+### Partea 11 — Setup complet fără cont Google (sideload direct)
+
+Dacă nu vrei deloc cont Google pe device (niciun sign-in, telemetrie minimă) și instalezi orice aplicație prin sideload direct (fără Play Store), poți dezactiva complet stiva Google:
+
+```
+adb shell "pm disable-user --user 0 com.google.android.gms"
+adb shell "pm disable-user --user 0 com.android.vending"
+adb shell "pm disable-user --user 0 com.google.android.gsf"
+```
+
+Pe acest device, asta a eliberat ~260MB RAM (cele două procese GMS, `com.google.android.gms` și `com.google.android.gms.persistent`, foloseau împreună atât) — semnificativ pe un device cu doar 1GB total.
+
+Pentru a instala aplicații fără Play Store, descarcă APK-ul oficial direct de la dezvoltator (nu de pe mirror-uri terțe necunoscute) și instalează-l prin ADB:
+
+```
+adb install nume_aplicatie.apk
+```
+
+Surse oficiale verificate, folosite în acest proiect: [videolan.org](https://www.videolan.org/vlc/download-android.html) pentru VLC, [stremio.com/downloads](https://www.stremio.com/downloads) pentru Stremio (secțiunea „Android TV" → „Manual install"), [buildbot.libretro.com](https://buildbot.libretro.com/stable/) pentru RetroArch.
+
+### Partea 12 — Emulare retro (RetroArch) pe acest hardware
+
+Chipset-ul (RK3528A, GPU Mali-450, 1GB RAM) e suficient pentru console retro pe 8/16-biți (NES, SNES, Mega Drive/Genesis, Game Boy/GBA) — rulează fără probleme prin **RetroArch** (open source), instalat prin sideload de pe buildbot-ul oficial Libretro (link mai sus, varianta `RetroArch.apk` pentru ARM32).
+
+Console mai pretențioase (PlayStation 1, N64) sunt la limită — GPU-ul slab și RAM-ul puțin fac jocurile 3D intensive greu de rulat stabil; merită testat per caz, nu garantat.
+
+**Important despre ROM-uri**: RetroArch în sine e legal (software open source). ROM-urile jocurilor comerciale (Nintendo, Sega etc.) sunt protejate de drepturi de autor — folosește doar ROM-uri pe care le deții legal (dump-uri proprii de pe cartușe fizice deținute) sau ROM-uri homebrew cu licență liberă (ex: [pdroms.de](https://pdroms.de)). Nu descărca pachete de ROM-uri de pe site-uri de arhivă.
+
+### Partea 13 — Maparea telecomenzii stock pentru emulatoare (referință hardware)
+
+Telecomanda standard a acestui box (model generic „TV98") se comportă ca o **tastatură HID Bluetooth standard** la nivel de kernel Linux — apare ca device-ul `/dev/input/eventX` cu numele **„TV98 Keyboard"** (plus un al doilea device, "TV98 Mouse", pentru funcția de pointer). Codurile exacte confirmate prin `adb shell getevent -lt`:
+
+| Buton fizic | Cod Linux (evdev) |
+|---|---|
+| Sus / Jos / Stânga / Dreapta (D-pad) | `KEY_UP` / `KEY_DOWN` / `KEY_LEFT` / `KEY_RIGHT` |
+| OK | `KEY_ENTER` |
+| Back | `KEY_BACK` |
+| Menu (≡) | `KEY_MENU` |
+| APPS | `KEY_PROPS` |
+| Volum + / − | `KEY_VOLUMEUP` / `KEY_VOLUMEDOWN` |
+| Mute | `KEY_MUTE` |
+| Canal ∧ / ∨ | **`KEY_UNKNOWN`** — nefuncțional |
+
+**Observație importantă**: butoanele de Canal (∧/∨) trimit coduri HID Consumer Page (`0x00de`/`0x00df` pe scan code-ul raw) pentru care driverul de kernel al acestui device **nu are un mapping definit** — ajung ca `KEY_UNKNOWN` și Android le ignoră complet, indiferent de aplicație sau configurare. Singura reparare ar fi un fișier `.kl` (keylayout) custom la nivel de `/system`/`/vendor`, netestat în acest proiect.
+
+Pentru emulatoare ca RetroArch, asta înseamnă: D-pad, OK, Back, Menu, Mute, APPS, Volum+/− sunt toate utilizabile ca bind-uri de taste fizice (prin Quick Menu → Controls → Port 1 Controls → apasă fizic tasta când ești întrebat), dar telecomanda stock, singură, nu poate acoperi toate funcțiile unui controller complet (ex: butoanele C de la N64) — un gamepad Bluetooth extern (ex: DualShock 4, recunoscut nativ de RetroArch) rămâne soluția practică pentru console cu mai multe butoane.
