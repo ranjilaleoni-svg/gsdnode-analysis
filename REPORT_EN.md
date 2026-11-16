@@ -4,6 +4,12 @@
 **Date:** 2026-11-16
 **Device:** Android TV box, labeled `HS86UI`, board `rockchip,rk3518-hugsun-x88pro-ddr4-v10` (chip is actually RK3528A; "RK3518" appears to be a mislabel used by this vendor), Android 14, build fingerprint `HS86UI.E160320.667.FE`, 1GB RAM, ~8GB eMMC, userdebug build, SELinux **Permissive**, bootloader unlocked, Google device/model properties spoofed to a Pixel 5 ("redfin").
 
+## Purchase information
+
+This exact unit (build fingerprint `HS86UI.E160320.667.FE`) was purchased in Romania via **eMag Marketplace**, listed under the name "Player Media 8K HDR" (TV Box Android, HS86UI Pro X88), sold and shipped by the marketplace seller **UWOT GERMANY GMBH**, for 233.17 RON, in November 2026.
+
+This is stated so other buyers can recognize the same listing/seller and avoid it, or check a unit they already own. It is **not** an accusation that this specific reseller knowingly installed or was aware of the agent described below — the firmware in question is almost certainly supplied upstream by the device's actual manufacturer/ODM in China (see "Related work" for other vendors with the same pattern), and resellers on marketplaces like eMag typically have no visibility into what ships inside the device they list. A formal complaint was filed with the seller and with Romania's consumer-protection authority (ANPC) regarding this specific purchase.
+
 ## Summary
 
 This box was acquired as a generic cheap Android TV streaming device. Wireless ADB debugging was left enabled by the vendor. Analysis of the running system found a root-privileged native binary, `gsdnode_android`, started directly by the vendor's own `init.rc`, which:

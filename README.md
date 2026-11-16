@@ -8,6 +8,10 @@ Independent analysis of a root-privileged remote-control / residential-proxy age
 - Removal script (tested, non-destructive — stubs the agent, does not touch `/system`): [neutralize_gsdnode.sh](neutralize_gsdnode.sh)
 - Router-level domain blocklist: [blocklist.txt](blocklist.txt)
 
+## Where this unit was bought
+
+Purchased in Romania via **eMag Marketplace**, listing "Player Media 8K HDR" (TV Box Android, HS86UI Pro X88), sold/shipped by marketplace seller **UWOT GERMANY GMBH**. This is reported so other buyers can recognize the listing — it is not a claim that this specific reseller was aware of what ships inside the device (see the full report for why).
+
 ## TL;DR
 
 A $20-30 Android TV box ships with a root-privileged agent that phones home to a server on Alibaba Cloud (`tws.gsda.com.cn:7704`, confirmed live) and carries plugin identifiers matching known PCDN/residential-proxy SDKs. This is the same pattern publicly reported for other vendors under names like **BADBOX**, **BADBOX 2.0**, **Vo1d** and **Operation Fuyao** — except this specific build doesn't appear to have been documented publicly before. If you own a box with build fingerprint `HS86UI.E160320.667.FE` (or similar `rockchip,rk3518-hugsun-*` board strings), you are very likely affected.

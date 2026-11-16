@@ -4,6 +4,12 @@
 **Data:** 2026-11-16
 **Device:** Box Android TV, etichetat `HS86UI`, placă `rockchip,rk3518-hugsun-x88pro-ddr4-v10` (chip-ul e de fapt RK3528A; „RK3518" pare o eticheta greșită folosită de acest vendor), Android 14, fingerprint de build `HS86UI.E160320.667.FE`, 1GB RAM, ~8GB eMMC, build userdebug, SELinux **Permissive**, bootloader deblocat, proprietăți de device/model Google falsificate ca Pixel 5 ("redfin").
 
+## Informații despre achiziție
+
+Exact acest device (fingerprint de build `HS86UI.E160320.667.FE`) a fost cumpărat din România prin **eMag Marketplace**, listat sub numele „Player Media 8K HDR" (TV Box Android, HS86UI Pro X88), vândut și livrat de comerciantul de pe marketplace **UWOT GERMANY GMBH**, cu 233,17 Lei, în noiembrie 2026.
+
+Această informație e menționată ca alți cumpărători să poată recunoaște același anunț/comerciant și să-l evite, sau să verifice un device pe care îl au deja. **Nu** e o acuzație că acest reseller anume ar fi instalat sau ar fi știut în mod conștient despre agentul descris mai jos — firmware-ul în cauză e aproape sigur furnizat în amonte de producătorul/ODM-ul real al device-ului din China (vezi secțiunea „Lucrări conexe" pentru alți vendori cu același tipar), iar resellerii de pe platforme precum eMag de obicei nu au vizibilitate asupra a ceea ce rulează efectiv în interiorul device-ului pe care îl listează. S-a depus o reclamație formală către vânzător și o sesizare către Autoritatea Națională pentru Protecția Consumatorilor (ANPC) legat de această achiziție specifică.
+
 ## Rezumat
 
 Boxul a fost achiziționat ca un device generic, ieftin, de streaming Android TV. Depanarea ADB wireless a fost lăsată activă de vendor. Analiza sistemului în funcțiune a găsit un binar nativ cu privilegii root, `gsdnode_android`, pornit direct de `init.rc`-ul propriu al vendor-ului, care:
